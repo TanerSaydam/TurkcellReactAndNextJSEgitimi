@@ -1,11 +1,18 @@
+import Layout from './Layout';
+import Login from './Login';
 import Todo from './Todo';
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
 
 function App(){
     return(
-        <>
-        <h1>App Component</h1>
-        <Todo />
-        </>
+        <BrowserRouter>        
+            <Routes>
+                <Route path='/' element={<Layout/>}>
+                    <Route path="/" element={<Todo />}></Route>
+                </Route>
+                <Route path="/login" element={<Login />} />
+            </Routes>
+        </BrowserRouter>
     )
 }
 //nested component

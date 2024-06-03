@@ -1,65 +1,69 @@
 import { useEffect, useState } from "react";
+import TodoList from "./TodoList";
+import CreateTodo from './CreateTodo';
 
 function Todo() {
     const [todos, setTodos] = useState([]);
     const [work, setWork] = useState("") //hooks
+    const [isValid, setIsValid] = useState(false);
 
-    function getAllTodoList(){
+    function getAllTodoList() {
         fetch("https://localhost:7067/api/Todos/GetAll")
-        .then(res => res.json())
-        .then(data => setTodos(data));
+            .then(res => res.json())
+            .then(data => setTodos(data));
     }
 
-    useEffect(() => {        
+    useEffect(() => {
         getAllTodoList();
-    },[])
+    }, [])
 
-    function setWorkFunc(e){
+    function setWorkFunc(e) {        
         setWork(e.target.value);
-    } 
-
-    function save(){
-        setTodos((prev) => [...prev,work]);
-        setWork("");
+        if(e.target.value.length < 3){
+            e.target.className = "form-control is-invalid"
+            //const divEL = document.querySelector("input + div");
+            //divEL.innerHtml = e.target.validationMessage;
+            setIsValid(false);
+        }else{
+            e.target.className = "form-control is-valid"
+            setIsValid(true);
+        }
     }
-    
-    const redStyle = {color: "red"};
+
+    function save() {
+        if(!isValid){
+            alert("Validation hatası!")
+            return;
+        }
+        const data = {
+            title: work,
+            completed: false
+        }
+
+        fetch("https://localhost:7067/api/Todos/Create", {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(() => {
+            getAllTodoList();
+            setWork("");
+        });
+    }
+
+    const deleteById = (id) => {
+        const result = confirm("You want to delete this record?")
+        if (result) {
+            fetch(`https://localhost:7067/api/Todos/DeleteById?id=${id}`)
+                .then(() => getAllTodoList());
+        }
+    }
     return (
         <>
             <h1>Todo component</h1>
-            <input onChange={setWorkFunc} value={work}/>
-            <button onClick={save}>Save</button>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>User Id</th>
-                        <th>Title</th>
-                        <th>Completed</th>
-                        <th>Operations</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {todos.map((val,i) => {                        
-                        const num = "1";
-                        //ternary operatörü // single if line
-                        return(
-                            <tr>
-                                <td>{i + +num}</td>
-                                <td>{val.userId}</td>
-                                <td>{val.title}</td>
-                                <td>{val.completed 
-                                        ? <span style={{color: "green"}}>Completed</span>  
-                                        : <span style={redStyle}>Not Completed</span>}</td>
-                                <td>
-                                    <button>Update</button>
-                                    <button>Delete</button>
-                                </td>
-                            </tr>
-                        )
-                    })}
-                </tbody>
-            </table>
+            <CreateTodo isValid={isValid} setFunc={setWorkFunc} work={work} save={save} />
+            <TodoList data={todos} deleteAction={deleteById} />
         </>
     )
 }

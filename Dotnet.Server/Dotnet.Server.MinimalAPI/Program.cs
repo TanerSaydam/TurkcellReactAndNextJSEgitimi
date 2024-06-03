@@ -1,25 +1,56 @@
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors();
 
+builder.Services.AddTransient<ApplicationDbContext>();
+
+ServiceProvider provider = builder.Services.BuildServiceProvider();
+var context = provider.GetRequiredService<ApplicationDbContext>();
+
 var app = builder.Build();
 
+app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
-List<Todo> Todos = new()
+app.MapGet("/api/Todos/GetAll", async (CancellationToken cancellationToken) =>
 {
-    new(1,1,"delectus aut autem",false),
-    new(2,1,"quis ut nam facilis et officia qui",true),
-};
-
-app.MapGet("/api/Todos/GetAll", () =>
-{
-    return Results.Ok(Todos);
+    var todos = await context.Todos.ToListAsync(cancellationToken);
+    return Results.Ok(todos);
 });
 
+app.MapPost("/api/Todos/Create", async (CreateTodoDto request, CancellationToken cancellationToken) =>
+{
+    Todo todo = new(0, request.Title, request.Completed);
+    await context.AddAsync(todo, cancellationToken);
+    await context.SaveChangesAsync(cancellationToken);
 
-app.UseCors(x => x.AllowAnyOrigin());
+    return Results.Created();
+});
+
+app.MapGet("/api/Todos/DeleteById", async (int id, CancellationToken cancellationToken) =>
+{
+    Todo? todo = await context.Todos.FindAsync(id, cancellationToken);
+    if (todo is null) return Results.NotFound();
+
+    context.Remove(todo);
+    await context.SaveChangesAsync(cancellationToken);
+
+    return Results.NoContent();
+});
 
 app.Run();
 
+record Todo(int Id, string Title, bool Completed);
 
-record Todo(int Id, int UserId, string Title, bool Completed);
+record CreateTodoDto(string Title, bool Completed);
+
+class ApplicationDbContext : DbContext
+{
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseInMemoryDatabase("MyDb");
+    }
+
+    public DbSet<Todo> Todos { get; set; }
+}
