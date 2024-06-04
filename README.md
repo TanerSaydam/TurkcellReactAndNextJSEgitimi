@@ -34,8 +34,14 @@ React yapısında router içerisinde gelmiyor. O yüzden ekstra kütüphane kura
 npm install -D react-router-dom
 ```
 
-## Next.js CLI Kurulum Komutu
+## Next.js CLI Komutları
 
+- Kurulum
 ```bash
 npx create-next-app
+```
+
+- Çalıştırma
+```bash
+npm run dev
 ```
