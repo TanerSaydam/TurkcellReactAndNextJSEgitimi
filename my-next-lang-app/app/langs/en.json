@@ -1,0 +1,14 @@
+{
+    "home":{
+        "main": "Welcome!"
+    },
+    "navbar":{
+        "home":"Home",
+        "products":"Products",
+        "turkish": "Turkish",
+        "english": "English"
+    },
+    "products":{
+        "main": "Products"
+    }
+}

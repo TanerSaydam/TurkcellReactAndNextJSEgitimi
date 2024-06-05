@@ -12,5 +12,5 @@ export default async function Todos(){
         <ul>
             {todos.map((val,i)=> <li key={i}>{val.title}</li>)}
         </ul>
-    )//10:27
+    )
 }

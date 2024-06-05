@@ -1,0 +1,14 @@
+{
+    "home":{
+        "main": "Hoşgeldiniz!"
+    },
+    "navbar":{
+        "home":"Ana Sayfa",
+        "products":"Ürünler",
+        "turkish": "Türkçe",
+        "english": "İngilizce"
+    },
+    "products":{
+        "main": "Ürünler"
+    }
+}
