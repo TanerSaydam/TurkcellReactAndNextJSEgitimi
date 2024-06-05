@@ -15,7 +15,7 @@ app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
 app.MapGet("/api/Todos/GetAll", async (CancellationToken cancellationToken) =>
 {
-    var todos = await context.Todos.ToListAsync(cancellationToken);
+    var todos = await context.Todos.ToListAsync(cancellationToken);    
     return Results.Ok(todos);
 });
 
